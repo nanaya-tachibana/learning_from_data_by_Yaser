@@ -2,4 +2,4 @@
 
 ## Week6
 
-- (EXP)[THE DANGER OF OVERFITTING](http://nbviewer.ipython.org/github/nanaya-tachibana/learning_from_data_by_Yaser/blob/master/noise_impact.ipynb)
+- (EXP)[THE DANGER OF OVERFITTING](http://nbviewer.ipython.org/github/nanaya-tachibana/learning_from_data_by_Yaser/blob/master/Index.ipynb)

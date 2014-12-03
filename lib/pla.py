@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from .dataset import PointsDataset
 
 
 class PLA:
@@ -56,7 +55,6 @@ class PLA:
                 return False
         return count
 
-
     def predict(self, X):
         """
         Predict the label.
@@ -83,12 +81,15 @@ class PLA:
 
         # create a mesh to plot in
         h = .02  # step size
-        x1_min, x1_max = X[:, 0].min() - 2, X[:, 0].max() + 1
-        x2_min, x2_max = X[:, 1].min() - 2, X[:, 1].max() + 1
-        x1x1, x2x2 = np.meshgrid(np.arange(x1_min, x1_max, h), np.arange(x2_min, x2_max, h))
+        x1_min, x1_max = -3, 3
+        x2_min, x2_max = -3, 3
+        x1x1, x2x2 = np.meshgrid(np.arange(x1_min, x1_max, h),
+                                 np.arange(x2_min, x2_max, h))
         # plot boundary
         labels = self.predict(np.c_[x1x1.ravel(), x2x2.ravel()])
-        ax.contourf(x1x1, x2x2, labels.reshape(x1x1.shape), cmap=plt.cm.Paired, alpha=0.8)
+        ax.contourf(x1x1, x2x2, labels.reshape(x1x1.shape),
+                    cmap=plt.cm.Paired, alpha=0.8)
+
 
 #fig, ax = plt.subplots()
 #training_set = PointsDataset(10)

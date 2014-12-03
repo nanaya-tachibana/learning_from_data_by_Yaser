@@ -1,6 +1,7 @@
 import numpy as np
 from .pla import PLA
 
+
 class LinearRegression(PLA):
     """
     A linear regression object.
@@ -66,4 +67,5 @@ class LinearClassifier(LinearRegression):
         """
         predicted = self.predict(X)
         y = self.transformy(y)
-        return 1 - (y == predicted).sum() / predicted.size 
+        return 1 - (y == predicted).sum() / predicted.size
+

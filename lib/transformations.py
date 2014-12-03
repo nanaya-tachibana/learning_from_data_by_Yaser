@@ -3,7 +3,7 @@ import numpy as np
 
 def add_bias(X):
     return np.vstack([np.ones(X.shape[0]), X.T]).T
- 
+
 
 def phi_transform(X):
     """

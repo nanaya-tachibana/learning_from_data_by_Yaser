@@ -73,7 +73,7 @@ class PLA:
         y = self.transformy(y)
         return 1 - (y == predicted).sum() / predicted.size
 
-    def plot(self, ax=None):
+    def plot(self, X, y, ax=None):
         assert self.w is not None
 
         if ax is None:
@@ -81,8 +81,8 @@ class PLA:
 
         # create a mesh to plot in
         h = .02  # step size
-        x1_min, x1_max = -3, 3
-        x2_min, x2_max = -3, 3
+        x1_min, x1_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+        x2_min, x2_max = X[:, 1].min() - 1, X[:, 1].max() + 1
         x1x1, x2x2 = np.meshgrid(np.arange(x1_min, x1_max, h),
                                  np.arange(x2_min, x2_max, h))
         # plot boundary

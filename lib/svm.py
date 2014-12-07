@@ -68,15 +68,17 @@ class SVM:
     """
     A support vector machine object.
     """
-    def __init__(self, kernel=None):
+    def __init__(self, tol=1e-3, kernel=None):
+        """
+        tol: Tolerance that is criterion of determining wether an alpha is zero or not.
+        """
         if kernel is None:
             kernel = linear_kernel()
 
-        self.kernel = kernel
-        self._X = None
-        self._y = None
-        self.b = None
-        self.alphas = None
+        self.tol = tol
+        self.kernel = kernel  # kernel function
+        self.alphas, self.b = None, None
+        self._X, self._y = None, None  # supports vectors
         self.supports = None  # index of support vectors
 
     def get_weight(self):
@@ -92,16 +94,16 @@ class SVM:
         """
         Return support vectors
         """
-        return self._X[self.supports]
+        return self._X
 
     def _estimate(self, x):
         """
-        Compute alpha * y * kernel
+        Compute the value of alpha * y * kernel
         """
         assert self.alphas is not None and self.supports is not None
 
-        i = self.supports
-        return ((self.alphas[i] * self._y[i])[:, np.newaxis] * self.kernel(self._X[i], x)).sum(axis=0)
+        return ((self.alphas * self._y)[:, np.newaxis]
+                * self.kernel(self._X, x)).sum(axis=0)
 
     def fit(self, X, y):
         """
@@ -109,7 +111,6 @@ class SVM:
         """
         assert y.shape[0] == X.shape[0]
 
-        self._X, self._y = X, y
         y = y.reshape((-1, 1))  # force column vector
         n, d = X.shape
 
@@ -125,11 +126,13 @@ class SVM:
         solvers.options['show_progress'] = False
         alphas = solvers.qp(matrix(Q, tc='d'), matrix(p), matrix(G),
                             matrix(h), matrix(A, tc='d'), matrix(b))['x']
-        alphas = np.round(alphas, 6).reshape(-1)  # convert to numpy array and round to 5 decimal places
 
-        if np.all(alphas == 0):
+        alphas = np.ravel(alphas)
+        if np.all(alphas < self.tol):
             raise AssertionError('all alphas are zero.')
-        self.alphas, self.supports = alphas, np.where(alphas > 0)[0]
+        self.supports = np.where(alphas > self.tol)[0]
+        self.alphas = alphas[self.supports]
+        self._X, self._y = X[self.supports], y[self.supports].ravel()
         m = self.supports[0]
         self.b = y[m] - self._estimate(X[m])
 
@@ -146,13 +149,12 @@ class SVM:
         predicted = self.predict(X)
         return 1 - (y == predicted).sum() / predicted.size
 
-    def plot(self, ax=None):
+    def plot(self, X, y, ax=None):
         assert self.alphas is not None and self.supports is not None
 
         if ax is None:
             fig, ax = plt.subplots()
 
-        X = self._X
         # create a mesh to plot in
         h = .02  # step size
         x1_min, x1_max = X[:, 0].min() - 1, X[:, 0].max() + 1
@@ -164,8 +166,8 @@ class SVM:
         labels = self.predict(np.c_[x1x1.ravel(), x2x2.ravel()])
         ax.contourf(x1x1, x2x2, labels.reshape(x1x1.shape),
                     cmap=plt.cm.Paired, alpha=0.8)
-        # plot traning set
-        plt.scatter(X[:, 0], X[:, 1], s=40, c=self._y, cmap=plt.cm.Paired)
+        # plot data set
+        plt.scatter(X[:, 0], X[:, 1], s=40, c=y, cmap=plt.cm.Paired)
         # plot support vectors
         # draw a square around each support vector
         square = {'marker': 's',
@@ -178,7 +180,7 @@ class SVM:
 
 # fig, ax = plt.subplots()
 # training_set = PointsDataset(10)
+# X, y = training_set.get_X(), training_set.get_y()
 # svm = SVM()
-# svm.fit(training_set.get_X(), training_set.get_y())
-# svm.plot(ax=ax)
-
+# svm.fit(X, y)
+# svm.plot(X, y, ax=ax)

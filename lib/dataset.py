@@ -67,8 +67,7 @@ class PointsDataset(Dataset):
 
     def plot(self, ax=None):
         """
-        highlighted: a list of indexes of points which are highlighed.
-        hightlight_style: ...
+        Plot data points and boundary
         """
         if ax is None:
             fig, ax = plt.subplots()
